@@ -1,46 +1,41 @@
 import matplotlib.pyplot as plt
-from config import GRID_SIZE
+import os
 
-# ==============================
-# Plot Spatial Distribution
-# ==============================
+os.makedirs("outputs", exist_ok=True)
 
-def plot_environment(banks, requests, save_path="outputs_spatial_distribution.png"):
-    
-    bank_x = [b["x"] for b in banks]
-    bank_y = [b["y"] for b in banks]
+def plot_model_comparison(results):
 
-    request_x = [r["x"] for r in requests]
-    request_y = [r["y"] for r in requests]
+    models = ["GeoAI Token", "Baseline"]
+    means = [results["baseline_avg"], results["token_avg"]]
+    stds = [results["baseline_std"], results["token_std"]]
 
-    plt.figure(figsize=(8, 8))
-    
-    # Plot requests
-    plt.scatter(request_x, request_y, 
-                color="lightgray", 
-                s=10, 
-                alpha=0.6, 
-                label="Emergency Requests")
+    plt.figure(figsize=(7,5))
+    bars = plt.bar(models, means, yerr=stds, capsize=10)
 
-    # Plot banks
-    plt.scatter(bank_x, bank_y, 
-                color="red", 
-                s=80, 
-                marker="^", 
-                label="Blood Banks")
+    bars[0].set_color("gray")
+    bars[1].set_color("green")
 
-    plt.xlim(0, GRID_SIZE)
-    plt.ylim(0, GRID_SIZE)
+    plt.ylabel("Success Rate")
+    plt.title("GeoAI Outperforms Baseline Under Demand Clustering")
+    plt.ylim(0, 1)
 
-    plt.title("Spatial Distribution of Blood Banks and Emergency Requests")
-    plt.xlabel("X Coordinate")
-    plt.ylabel("Y Coordinate")
-    plt.legend()
+    plt.savefig("outputs/model_comparison.png")
+    plt.close()
 
-    plt.grid(True, linestyle="--", alpha=0.3)
 
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=300)
-    plt.show()
+def plot_distance_comparison(results):
 
-    print(f"Figure saved as: {save_path}")
+    models = ["Baseline", "GeoAI Token"]
+    values = [results["baseline_distance"], results["token_distance"]]
+
+    plt.figure(figsize=(7,5))
+    bars = plt.bar(models, values)
+
+    bars[0].set_color("gray")
+    bars[1].set_color("green")
+
+    plt.ylabel("Average Allocation Distance")
+    plt.title("Average Distance Comparison")
+
+    plt.savefig("outputs/distance_comparison.png")
+    plt.close()
